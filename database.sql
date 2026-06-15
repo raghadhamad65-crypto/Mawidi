@@ -1,0 +1,16 @@
+CREATE DATABASE IF NOT EXISTS ecommerce_db;
+USE ecommerce_db;
+CREATE TABLE IF NOT EXISTS users (user_id INT PRIMARY KEY AUTO_INCREMENT, full_name VARCHAR(100) NOT NULL, email VARCHAR(100) UNIQUE NOT NULL, password VARCHAR(255) NOT NULL, phone VARCHAR(20), address TEXT, role ENUM('customer','admin') DEFAULT 'customer', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS categories (category_id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(50) UNIQUE NOT NULL, description TEXT);
+CREATE TABLE IF NOT EXISTS products (product_id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(150) NOT NULL, description TEXT, price DECIMAL(10,2) NOT NULL, stock_quantity INT DEFAULT 0, image_url VARCHAR(255), category_id INT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE SET NULL);
+CREATE TABLE IF NOT EXISTS cart_items (cart_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, product_id INT, quantity INT NOT NULL, added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, UNIQUE(user_id, product_id), FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE, FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE);
+CREATE TABLE IF NOT EXISTS orders (order_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, total_amount DECIMAL(10,2) NOT NULL, status ENUM('pending','paid','shipped','delivered','cancelled') DEFAULT 'pending', shipping_address TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE RESTRICT);
+CREATE TABLE IF NOT EXISTS order_items (order_item_id INT PRIMARY KEY AUTO_INCREMENT, order_id INT, product_id INT, quantity INT NOT NULL, unit_price DECIMAL(10,2) NOT NULL, FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE, FOREIGN KEY (product_id) REFERENCES products(product_id));
+CREATE TABLE IF NOT EXISTS contacts (message_id INT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(100) NOT NULL, email VARCHAR(100) NOT NULL, subject VARCHAR(100), message TEXT NOT NULL, is_read BOOLEAN DEFAULT FALSE, submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+INSERT IGNORE INTO categories VALUES (1,'Women','Women clothes'),(2,'Men','Men clothes'),(3,'Accessories','Accessories');
+INSERT IGNORE INTO users (user_id,full_name,email,password,phone,address,role) VALUES (1,'Admin User','admin@stylehub.com','$2y$10$wH.5g7hbUbuWbqH/4U.ECeKsoFuoOx3pHCBqPQdzGTU59aNQ71miW','0590000000','Palestine','admin');
+INSERT IGNORE INTO products VALUES
+(1,'Classic White Shirt','Elegant cotton shirt.',25,20,'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800',2,NOW()),
+(2,'Elegant Dress','Modern dress with soft fabric.',55,12,'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800',1,NOW()),
+(3,'Denim Jacket','Stylish denim jacket.',70,10,'https://images.unsplash.com/photo-1543076447-215ad9ba6923?w=800',2,NOW()),
+(4,'Black Handbag','Elegant handbag.',35,18,'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=800',3,NOW());
